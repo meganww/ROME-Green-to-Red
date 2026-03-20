@@ -1,0 +1,37 @@
++     1: <!DOCTYPE html>
++     2: <html lang="en">
++     3: <head>
++     4: <meta charset="UTF-8">
++     5: <meta name="viewport" content="width=device-width, initial-scale=1.0">
++     6: <title>ROME CRET Actionable Backlog — Green-to-Red Predictor</title>
++     7: <link rel="stylesheet" href="styles.css">
++     8: </head>
++     9: <body>
++    10: 
++    11: <div class="header">
++    12:   <h1>🚛 ROME <span>Green-to-Red Predictor</span> <span class="site" id="siteLabel"></span></h1>
++    13:   <div class="controls">
++    14:     <label class="btn" id="uploadBtn">📁 Upload CSV</label>
++    15:     <input type="file" id="csvFile" accept=".csv" style="display:none">
++    16:     <span class="data-badge" id="dataBadge" style="display:none"></span>
++    17:   </div>
++    18: </div>
++    19: 
++    20: <div class="dashboard" id="dashboard">
++    21:   <div class="empty">
++    22:     <h2>ROME CRET Actionable Backlog Predictor</h2>
++    23:     <p style="margin-bottom:16px">Upload the ROME Yard Backlog T-Score → Actionable Trailer Backlog CSV</p>
++    24:     <div class="upload-zone" id="dropZone">
++    25:       <p>📄 Drop CSV file here or click to browse</p>
++    26:       <p class="small">ROME QuickSight → Yard Backlog T-Score → Actionable Trailers (sorted by T-Score desc) → Export CSV</p>
++    27:     </div>
++    28:     <p style="font-size:12px;color:#484f58;margin-top:12px">
++    29:       Only actionable trailers are shown — non-actionable/tagged trailers are filtered out
++    30:     </p>
++    31:   </div>
++    32: </div>
++    33: 
++    34: <script src="rome-engine.js"></script>
++    35: <script src="app.js"></script>
++    36: </body>
++    37: </html>
