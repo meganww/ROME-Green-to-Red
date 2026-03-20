@@ -4,7 +4,163 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PHX6 ROME Dashboard</title>
-<link rel="stylesheet" href="styles.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh}
+#app{max-width:1700px;margin:0 auto;padding:16px}
+
+/* Header */
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:20px;padding:12px 16px;background:linear-gradient(135deg,#16213e,#0f3460);border-radius:12px;border:1px solid #1a3a6a}
+.header-left{display:flex;align-items:baseline;gap:12px}
+header h1{font-size:1.3rem;color:#e94560}
+.subtitle{font-size:.85rem;color:#a0aec0;font-weight:500}
+#freshness{font-size:.8rem;color:#a0aec0}
+.warning-banner{background:#744210;border:1px solid #d69e2e;color:#fefcbf;padding:8px 16px;border-radius:6px;margin-bottom:12px;font-weight:600}
+
+/* Tabs */
+#tab-bar{display:flex;gap:4px;margin-bottom:16px}
+.tab{padding:10px 20px;border:1px solid #1a3a6a;border-bottom:none;border-radius:8px 8px 0 0;background:#0f3460;color:#a0aec0;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s}
+.tab:hover{background:#1a4a7a;color:#e2e8f0}
+.tab.active{background:#16213e;color:#e94560;border-color:#e94560;border-bottom:2px solid #16213e;margin-bottom:-1px;position:relative;z-index:1}
+.tab-content{border:1px solid #1a3a6a;border-radius:0 8px 8px 8px;padding:16px;background:#16213e20}
+
+/* Upload */
+.upload-card{background:#16213e;border-radius:16px;padding:40px;text-align:center;border:1px solid #1a3a6a;max-width:600px;margin:60px auto}
+.upload-card h2{color:#e94560;margin-bottom:8px;font-size:1.3rem}
+.upload-desc{color:#a0aec0;margin-bottom:24px;font-size:.9rem}
+.upload-box{border:2px dashed #4a5568;border-radius:12px;padding:40px 24px;cursor:pointer;transition:all .2s}
+.upload-box:hover,.upload-box.dragover{border-color:#e94560;background:rgba(233,69,96,.05)}
+.upload-icon{font-size:2.5rem;margin-bottom:8px}
+.file-label{color:#63b3ed;cursor:pointer;text-decoration:underline}
+.hint{font-size:.78rem;color:#718096;margin-top:10px}
+
+/* Summary Cards */
+#summary-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.card{padding:14px;border-radius:10px;text-align:center;border:1px solid rgba(255,255,255,.08)}
+.card .card-val{font-size:1.8rem;font-weight:700}
+.card .card-label{font-size:.75rem;opacity:.85;margin-top:2px}
+.card-dark{background:#2d3748;color:#e2e8f0}
+.card-red{background:linear-gradient(135deg,#9b2c2c,#c53030);color:#fff}
+.card-orange{background:linear-gradient(135deg,#c05621,#dd6b20);color:#fff}
+.card-green{background:linear-gradient(135deg,#276749,#38a169);color:#fff}
+.card-blue{background:linear-gradient(135deg,#2b6cb0,#3182ce);color:#fff}
+
+/* CRETS Bar */
+#cret-backlog-bar{background:linear-gradient(135deg,#1a3a6a,#0f3460);border:1px solid #e94560;border-radius:10px;padding:14px 18px;margin-bottom:12px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.backlog-section{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.backlog-section:not(:last-child){border-right:1px solid #2d3748;padding-right:16px}
+.upt-input{width:100px;padding:6px 10px;border-radius:6px;border:1px solid #4a5568;background:#2d3748;color:#fff;font-size:.9rem;font-weight:600;text-align:center}
+.upt-input::placeholder{color:#718096;font-weight:400;font-size:.8rem}
+#crets-bar{background:#16213e;border:1px solid #1a3a6a;border-radius:10px;padding:14px 18px;margin-bottom:16px;display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.crets-label{font-weight:700;color:#e94560;font-size:.9rem;white-space:nowrap}
+.crets-stat{font-size:.85rem;color:#cbd5e0}
+.crets-stat strong{color:#fff}
+.crets-bar-visual{flex:1;min-width:200px;height:22px;background:#2d3748;border-radius:6px;overflow:hidden;display:flex}
+.crets-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:600;color:#fff;min-width:2px;transition:width .3s}
+
+/* Filters */
+#filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px;padding:10px 14px;background:#16213e;border-radius:8px;border:1px solid #1a3a6a}
+.filter-group{display:flex;align-items:center;gap:8px}
+.filter-label{font-size:.78rem;color:#718096;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.checkbox-group{display:flex;gap:8px}
+.checkbox-group label,.toggle{font-size:.83rem;display:flex;align-items:center;gap:4px;cursor:pointer;color:#cbd5e0}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot-green{background:#38a169}.dot-yellow{background:#d69e2e}.dot-red{background:#e53e3e}
+#filters select{padding:5px 10px;border-radius:6px;border:1px solid #4a5568;background:#2d3748;color:#e2e8f0;font-size:.83rem}
+#filters button{padding:6px 14px;border-radius:6px;border:none;font-size:.83rem;cursor:pointer;font-weight:600}
+#btn-export{background:#e94560;color:#fff}
+#btn-export:hover{background:#c53030}
+.btn-secondary{background:#4a5568;color:#e2e8f0}
+.btn-secondary:hover{background:#718096}
+
+/* Table */
+#table-container{overflow:auto;max-height:65vh;background:#16213e;border-radius:10px;border:1px solid #1a3a6a}
+#main-table{width:100%;border-collapse:collapse;font-size:.82rem}
+#main-table thead{position:sticky;top:0;z-index:2}
+#main-table th{background:#0f3460;color:#a0aec0;padding:10px 8px;cursor:pointer;white-space:nowrap;user-select:none;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #1a3a6a}
+#main-table th:hover{background:#1a4a7a}
+#main-table th .sort-arrow{margin-left:3px;font-size:.65rem}
+#main-table td{padding:7px 8px;border-bottom:1px solid #1a2744;white-space:nowrap}
+#main-table tbody tr{cursor:pointer;transition:background .15s}
+#main-table tbody tr:hover{background:rgba(233,69,96,.08)}
+tr.row-red{background:rgba(229,62,62,.1)}
+tr.row-yellow{background:rgba(214,158,46,.08)}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+#row-count{font-size:.78rem;color:#718096;margin-top:6px;text-align:right}
+
+/* Badges */
+.badge{padding:2px 8px;border-radius:4px;font-size:.75rem;font-weight:600;display:inline-block}
+.bg-green{background:#276749;color:#c6f6d5}
+.bg-yellow{background:#744210;color:#fefcbf}
+.bg-red{background:#9b2c2c;color:#fed7d7}
+.badge-orange{background:#c05621;color:#fff}
+.badge-gray{color:#4a5568}
+.flag-y{color:#fc8181;font-weight:700}
+.flag-n{color:#4a5568}
+.boost-warn{color:#fbd38d;font-weight:600}
+.boost-low{color:#68d391}
+.act-y{color:#68d391;font-weight:600}
+.act-n{color:#a0aec0;font-style:italic}
+tr.row-nonact{opacity:.5}
+tr.row-nonact:hover{opacity:.8}
+tr.row-tagged{background:rgba(214,158,46,.12)}
+
+/* Detail Panel */
+#detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:flex;justify-content:flex-end}
+#detail-panel{width:min(620px,92vw);background:#1a1a2e;height:100%;overflow-y:auto;padding:24px;position:relative;border-left:2px solid #e94560}
+#detail-close{position:absolute;top:12px;right:12px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:#a0aec0}
+#detail-close:hover{color:#fff}
+#detail-content h2{margin-bottom:16px;color:#e94560}
+#detail-content h3{margin:18px 0 8px;font-size:.95rem;color:#63b3ed;border-bottom:1px solid #2d3748;padding-bottom:4px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:.88rem}
+.detail-grid dt{color:#718096}
+.detail-grid dd{font-weight:600;color:#e2e8f0}
+.countdown-bar{height:28px;border-radius:6px;overflow:hidden;margin:8px 0;background:#2d3748}
+.countdown-fill{height:100%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:600;color:#fff;transition:width .3s}
+.score-bar{display:flex;height:28px;border-radius:6px;overflow:hidden;margin:8px 0;font-size:.72rem;color:#fff;font-weight:600}
+.score-bar>div{display:flex;align-items:center;justify-content:center;min-width:30px}
+.bar-dwell{background:#3182ce}.bar-tts{background:#38a169}.bar-fba{background:#805ad5}
+.detail-table{width:100%;border-collapse:collapse;font-size:.83rem;margin-top:4px}
+.detail-table th,.detail-table td{padding:5px 8px;border:1px solid #2d3748;text-align:right}
+.detail-table th{background:#0f3460;color:#a0aec0;text-align:left}
+.detail-table td{color:#e2e8f0}
+.prediction-box{background:rgba(233,69,96,.1);border:1px solid #e94560;padding:14px;border-radius:8px;margin-top:8px}
+.prediction-box p{margin:4px 0;color:#e2e8f0}
+
+/* Info */
+#info-section{margin-top:16px;background:#16213e;border-radius:10px;padding:14px;border:1px solid #1a3a6a}
+#info-section summary{cursor:pointer;font-weight:600;color:#63b3ed}
+.info-content{margin-top:12px;font-size:.88rem;color:#cbd5e0}
+.info-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:768px){.info-cols{grid-template-columns:1fr}}
+.info-content h3{margin:12px 0 6px;color:#e94560;font-size:.9rem}
+.info-content code{display:block;background:#0f3460;padding:10px;border-radius:6px;margin:4px 0;font-size:.8rem;white-space:pre-wrap;color:#63b3ed}
+.info-content ul{margin-left:20px}
+.info-table{border-collapse:collapse;margin:4px 0;font-size:.83rem;width:100%}
+.info-table th,.info-table td{border:1px solid #2d3748;padding:4px 10px}
+.info-table th{background:#0f3460;color:#a0aec0}
+
+/* YMS tab reuses table styles */
+#yms-table-container{overflow:auto;max-height:65vh;background:#16213e;border-radius:10px;border:1px solid #1a3a6a}
+#yms-table{width:100%;border-collapse:collapse;font-size:.82rem}
+#yms-table thead{position:sticky;top:0;z-index:2}
+#yms-table th{background:#0f3460;color:#a0aec0;padding:10px 8px;cursor:pointer;white-space:nowrap;user-select:none;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #1a3a6a}
+#yms-table th:hover{background:#1a4a7a}
+#yms-table th .sort-arrow{margin-left:3px;font-size:.65rem}
+#yms-table td{padding:7px 8px;border-bottom:1px solid #1a2744;white-space:nowrap}
+#yms-table tbody tr{cursor:pointer;transition:background .15s}
+#yms-table tbody tr:hover{background:rgba(99,179,237,.08)}
+#yms-filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px;padding:10px 14px;background:#16213e;border-radius:8px;border:1px solid #1a3a6a}
+#yms-row-count{font-size:.78rem;color:#718096;margin-top:6px;text-align:right}
+.loc-dock{color:#68d391;font-weight:600}
+.loc-yard{color:#fbd38d}
+.loc-unknown{color:#718096}
+.stale-yes{color:#fc8181;font-weight:600}
+.stale-no{color:#4a5568}
+
+.hidden{display:none!important}
+
+</style>
 </head>
 <body>
 <div id="app">
@@ -160,8 +316,1026 @@ dwell + tts + fba ≥ 3,550</code>
     </div>
   </div>
 </div>
-<script src="app.js"></script>
-<script src="yms.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  let allData = [], filtered = [], sortCol = 'days_until_red', sortAsc = true;
+
+  // Expose for cross-tab enrichment
+  window.getTScoreData = () => allData;
+
+  const HEADER_MAP = {
+    'equipment visit id': 'equipment_visit_id',
+    'equipment number': 'equipment_number',
+    'building code': 'building_code',
+    'arrival time (local)': 'arrival_time_local',
+    'trailer dwell days': 'trailer_dwell_days',
+    'rome t-score': 'rome_tscore',
+    'total units': 'total_units',
+    'total packages': 'total_packages',
+    'tts units': 'tts_units',
+    'fba units': 'fba_units',
+    'zappos units': 'zappos_units',
+    'trailer tts %': 'trailer_tts_pct',
+    'tts units expired': 'tts_units_expired',
+    'tts units expiring today': 'tts_units_expiring_today',
+    'tts units expiring next 3 days': 'tts_units_expiring_next_3_days',
+    'tts units expiring in 4 to 7 days': 'tts_units_expiring_in_4_7_days',
+    'tts units expiring after 7 days': 'tts_units_expiring_after_7_days',
+    'fba risk factor': 'fba_risk_factor',
+    'fba dollars expired': 'fba_dollars_expired',
+    'fba dollars expiring today': 'fba_dollars_expiring_today',
+    'fba dollars expiring next 3 days': 'fba_dollars_expiring_next_3_days',
+    'fba dollars expiring in 4 to 7 days': 'fba_dollars_expiring_in_4_7_days',
+    'fba dollars expiring in 8 to 14 days': 'fba_dollars_expiring_in_8_14_days',
+    'fba dollars expiring in 15 to 21 days': 'fba_dollars_expiring_in_15_21_days',
+    'fba dollars expiring in 22 to 30 days': 'fba_dollars_expiring_in_22_30_days',
+    'fba dollars expiring in 31 to 60 days': 'fba_dollars_expiring_in_31_60_days',
+    'tts dwell factor': 'tts_dwell_factor',
+    'dwell only factor': 'dwell_only_factor',
+    'carrier': 'carrier',
+    'owner': 'owner',
+    'latest yard location': 'yard_location',
+    'latest yard event type': 'latest_yard_event_type',
+    'yard notes': 'yard_notes',
+    'standard dock note': 'standarddocknote',
+    'is actionable': 'isactionable',
+    'isa': 'isa',
+    'vrid': 'vrid',
+    'yard label': 'yard_label',
+    'sdn trailer sort type': 'sdn_trailer_sort_type',
+    'rome trailer sort type': 'rome_trailer_sort_type',
+    'rome trailer product family': 'rome_trailer_product_family',
+    // Alternate ROME export format (Yard Backlog view)
+    't_score': 'rome_tscore',
+    't score': 'rome_tscore',
+    'dwell_hours': 'dwell_hours',
+    'dwell hours': 'dwell_hours',
+    'equipment_number_full': 'equipment_number_full',
+    'equipment number full': 'equipment_number_full',
+    'fba_dollars': 'fba_dollars',
+    'fba dollars': 'fba_dollars',
+    // Backlog snapshot columns
+    'units': 'actual_units',
+    'trailer_backlog_units': 'backlog_units',
+    'trailer backlog units': 'backlog_units',
+    'trailer_backlog_logic': 'backlog_logic',
+    'trailer backlog logic': 'backlog_logic',
+    'network_standard_assumptions_upt': 'upt_assumption',
+    'network standard assumptions upt': 'upt_assumption',
+    'network_standard_assumptions_source': 'upt_source',
+    'network standard assumptions source': 'upt_source',
+    'site_median_upt': 'site_median_upt',
+    'site median upt': 'site_median_upt',
+    'audit_fullness_pcnt': 'audit_fullness_pct',
+    'audit fullness pcnt': 'audit_fullness_pct',
+    'visibility_percentage': 'visibility_pct',
+    'visibility percentage': 'visibility_pct',
+    'site_visibility_pct': 'visibility_pct',
+    'upt_calc_method': 'upt_calc_method',
+    'effective_upt': 'effective_upt',
+    'effective upt': 'effective_upt',
+    'sort_type': 'final_trailer_sort_type',
+    'sort type': 'final_trailer_sort_type',
+    'trailer_visit_type': 'trailer_visit_type',
+    'trailer visit type': 'trailer_visit_type',
+  };
+
+  const COLUMNS = [
+    { key: 'overall_status', label: 'Status', fmt: 'color' },
+    { key: 'isactionable', label: 'Act', fmt: 'actionable' },
+    { key: 'equipment_number', label: 'Trailer #' },
+    { key: 'days_until_red', label: 'Days to Red', fmt: 'days' },
+    { key: '_proj_status', label: 'Tomorrow', fmt: 'color' },
+    { key: 'trailer_dwell_days', label: 'Dwell', fmt: 'num1' },
+    { key: 'rome_tscore', label: 'T-Score', fmt: 'num0' },
+    { key: 'tts_fba_boost', label: 'TTS+FBA Pts', fmt: 'boost' },
+    { key: 'total_units', label: 'Units', fmt: 'comma' },
+    { key: 'tts_units', label: 'TTS', fmt: 'comma' },
+    { key: 'tts_at_risk_3d', label: 'TTS @Risk 3d', fmt: 'comma' },
+    { key: 'tts_expired_flag', label: 'TTS Exp', fmt: 'flag' },
+    { key: 'fba_units', label: 'FBA', fmt: 'comma' },
+    { key: 'carrier', label: 'Carrier' },
+    { key: 'owner', label: 'Owner' },
+    { key: 'rome_trailer_sort_type', label: 'Sort Type' },
+    { key: 'yard_location', label: 'Yard Loc' },
+    { key: 'arrival_time_local', label: 'Arrived', fmt: 'datetime' },
+  ];
+
+  // --- CSV ---
+  function parseCSV(text) {
+    if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+    const firstLine = text.split(/\r?\n/)[0];
+    const delim = (firstLine.split('\t').length > firstLine.split(',').length) ? '\t' : ',';
+    const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+    if (lines.length < 2) return [];
+    const rawHeaders = parseLine(lines[0], delim);
+    const headers = rawHeaders.map(h => {
+      const clean = h.trim().toLowerCase();
+      return HEADER_MAP[clean] || clean.replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+    });
+    const rows = [];
+    for (let i = 1; i < lines.length; i++) {
+      if (!lines[i].trim()) continue;
+      const vals = parseLine(lines[i], delim);
+      const row = {};
+      headers.forEach((h, j) => { row[h] = (vals[j] || '').trim(); });
+      rows.push(row);
+    }
+    return rows;
+  }
+
+  function parseLine(line, delim) {
+    if (!delim) delim = ',';
+    const r = []; let c = '', q = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (q) { if (ch === '"' && line[i+1] === '"') { c += '"'; i++; } else if (ch === '"') q = false; else c += ch; }
+      else { if (ch === '"') q = true; else if (ch === delim) { r.push(c); c = ''; } else c += ch; }
+    }
+    r.push(c); return r;
+  }
+
+  function n(v) { const x = parseFloat(v); return isNaN(x) ? 0 : x; }
+
+  // --- Real ROME dwell factor curve ---
+  function dwellFactor(days) {
+    if (days <= 0) return 15;
+    if (days <= 3) return days * 50;
+    if (days <= 5) return 150 + (days - 3) * 100;
+    if (days === 6) return 350 + (days - 5) * 200;
+    if (days <= 9) return 550 + (days - 6) * 1000;
+    if (days <= 11) return 3550 + (days - 9) * 2000;
+    if (days <= 13) return 7550 + (days - 10) * 3000;
+    return 13550 + (Math.min(days, 30) - 13) * 4000;
+  }
+
+  // Find the dwell day where dwell_factor + tts + fba >= 3550 (red threshold)
+  function daysUntilRedSmart(currentDwell, ttsFactor, fbaFactor) {
+    for (let d = Math.ceil(currentDwell); d <= 30; d++) {
+      if (dwellFactor(d) + ttsFactor + fbaFactor >= 3550) {
+        return Math.max(0, d - currentDwell);
+      }
+    }
+    return Math.max(0, 30 - currentDwell);
+  }
+
+  function processRow(r) {
+    // Handle alternate column: dwell_hours → trailer_dwell_days
+    if (!r.trailer_dwell_days && r.dwell_hours) {
+      r.trailer_dwell_days = n(r.dwell_hours) / 24;
+    }
+    r.trailer_dwell_days = n(r.trailer_dwell_days);
+    r.rome_tscore = n(r.rome_tscore);
+    r.total_units = n(r.total_units);
+    r.tts_units = n(r.tts_units);
+    r.fba_units = n(r.fba_units);
+    r.tts_units_expired = n(r.tts_units_expired);
+    r.tts_units_expiring_today = n(r.tts_units_expiring_today);
+    r.tts_units_expiring_next_3_days = n(r.tts_units_expiring_next_3_days);
+    r.tts_units_expiring_in_4_7_days = n(r.tts_units_expiring_in_4_7_days);
+    r.tts_units_expiring_after_7_days = n(r.tts_units_expiring_after_7_days);
+    r.dwell_only_factor = n(r.dwell_only_factor);
+    r.tts_dwell_factor = n(r.tts_dwell_factor);
+    r.fba_risk_factor = n(r.fba_risk_factor);
+    r.fba_dollars_expired = n(r.fba_dollars_expired);
+    r.fba_dollars_expiring_today = n(r.fba_dollars_expiring_today);
+    r.fba_dollars_expiring_next_3_days = n(r.fba_dollars_expiring_next_3_days);
+    r.fba_dollars_expiring_in_4_7_days = n(r.fba_dollars_expiring_in_4_7_days);
+
+    // Normalize actionable flag
+    r.isactionable = (r.isactionable || 'N').toUpperCase().trim();
+
+    // Backlog fields
+    r.actual_units = n(r.actual_units);
+    r.backlog_units = n(r.backlog_units);
+    r.upt_assumption = n(r.upt_assumption);
+    r.effective_upt = n(r.effective_upt);
+    r.backlog_logic = (r.backlog_logic || '').trim();
+    r.has_visibility = r.backlog_logic === 'ROME Visibility' || r.actual_units > 100;
+
+    // Use actual TTS/FBA factors from CSV if available, otherwise estimate
+    const ttsF = r.tts_dwell_factor || (
+      r.tts_units_expired * 2.5 + n(r.tts_units_expiring_today) * 1.15 +
+      n(r.tts_units_expiring_next_3_days) * 0.8 + n(r.fba_dollars_expiring_in_4_7_days) * 0.40 +
+      n(r.tts_units_expiring_after_7_days) * 0.15
+    );
+    const fbaF = r.fba_risk_factor || (
+      n(r.fba_dollars_expiring_today) * 3.0 + n(r.fba_dollars_expiring_next_3_days) * 1.289 +
+      n(r.fba_dollars_expiring_in_4_7_days) * 0.55
+    );
+
+    // Smart prediction: walk the dwell curve accounting for TTS+FBA
+    r.days_until_red = Math.round(daysUntilRedSmart(r.trailer_dwell_days, ttsF, fbaF) * 100) / 100;
+    r.tts_fba_boost = Math.round(ttsF + fbaF);
+
+    // Current color from actual T-Score if available, otherwise from dwell curve
+    const currentScore = r.rome_tscore || (dwellFactor(r.trailer_dwell_days) + ttsF + fbaF);
+    r.rome_tscore = r.rome_tscore || Math.round(currentScore);
+    r.color_band = currentScore >= 3550 ? 'RED' : currentScore >= 350 ? 'YELLOW' : 'GREEN';
+    r.overall_status = r.color_band;
+
+    // Projected tomorrow
+    const tmrwScore = dwellFactor(r.trailer_dwell_days + 1) + ttsF + fbaF;
+    r._proj_score = Math.round(tmrwScore);
+    r._proj_status = tmrwScore >= 3550 ? 'RED' : tmrwScore >= 350 ? 'YELLOW' : 'GREEN';
+
+    // Risk flags
+    r.tts_at_risk_3d = n(r.tts_units_expiring_today) + n(r.tts_units_expiring_next_3_days);
+    r.tts_expired_flag = r.tts_units_expired > 0 ? 'Y' : 'N';
+    r.tts_accelerated = r.tts_fba_boost >= 100; // TTS/FBA adding 100+ points
+    return r;
+  }
+
+  // --- Summary ---
+  function updateCretBacklog() {
+    const act = allData.filter(r => r.isactionable === 'Y');
+    const totalTrailers = act.length;
+    const hasBacklogData = act.some(r => r.backlog_units > 0);
+    let totalUnits, withVis, withAssumption, avgUpt;
+    if (hasBacklogData) {
+      totalUnits = act.reduce((s, r) => s + r.backlog_units, 0);
+      withVis = act.filter(r => r.has_visibility).length;
+    } else {
+      totalUnits = act.reduce((s, r) => s + r.total_units, 0);
+      withVis = act.filter(r => r.total_units > 100).length;
+    }
+    withAssumption = totalTrailers - withVis;
+    avgUpt = totalTrailers > 0 ? Math.round(totalUnits / totalTrailers) : 0;
+
+    document.getElementById('cret-trailers').innerHTML = `Trailers: <strong>${totalTrailers}</strong>`;
+    document.getElementById('cret-visible').innerHTML = `Visible: <strong>${withVis}</strong> (${totalTrailers ? Math.round(withVis/totalTrailers*100) : 0}%)`;
+    document.getElementById('cret-assumed').innerHTML = withAssumption > 0
+      ? `Assumed: <strong style="color:#fbd38d">${withAssumption}</strong>` : '';
+    document.getElementById('cret-total-units').innerHTML = `Backlog: <strong style="color:#e94560;font-size:1.1rem">${totalUnits.toLocaleString()} units</strong>`;
+    document.getElementById('cret-avg-upt').innerHTML = `Avg UPT: <strong>${avgUpt.toLocaleString()}</strong>`;
+    const plan = parseFloat(document.getElementById('daily-plan-input').value) || 0;
+    document.getElementById('cret-backlog-days').innerHTML = plan > 0
+      ? `<strong style="color:${(totalUnits/plan)>3?'#fc8181':(totalUnits/plan)>2?'#fbd38d':'#9ae6b4'};font-size:1.1rem">${(totalUnits/plan).toFixed(2)} days</strong>` : '';
+    window._cretBacklog = { totalTrailers, totalUnits, avgUpt, withVis, withAssumption };
+  }
+
+  function renderSummary() {
+    updateCretBacklog();
+    const t = filtered.length;
+    const act = filtered.filter(r => r.isactionable === 'Y').length;
+    const red = filtered.filter(r => r.overall_status === 'RED').length;
+    const yel = filtered.filter(r => r.overall_status === 'YELLOW').length;
+    const grn = filtered.filter(r => r.overall_status === 'GREEN').length;
+    const ttsExp = filtered.filter(r => r.tts_expired_flag === 'Y').length;
+    const totalUnits = filtered.reduce((s, r) => s + r.total_units, 0);
+    document.getElementById('summary-cards').innerHTML = [
+      card('Total Trailers', t, 'card-dark'),
+      card('Actionable', act, 'card-blue'),
+      card('🔴 RED', red, 'card-red'),
+      card('🟡 YELLOW (≤2d)', yel, 'card-orange'),
+      card('🟢 GREEN', grn, 'card-green'),
+      card('TTS Expired', ttsExp, 'card-red'),
+    ].join('');
+  }
+
+  function card(l, v, c) {
+    return `<div class="card ${c}"><div class="card-val">${v.toLocaleString()}</div><div class="card-label">${l}</div></div>`;
+  }
+
+  function renderCRETSBar() {
+    const act = filtered.filter(r => r.isactionable === 'Y');
+    const nonact = filtered.filter(r => r.isactionable !== 'Y');
+    const t = filtered.length || 1;
+    const red = filtered.filter(r => r.overall_status === 'RED').length;
+    const yel = filtered.filter(r => r.overall_status === 'YELLOW').length;
+    const grn = filtered.filter(r => r.overall_status === 'GREEN').length;
+    const rP = (red/t*100).toFixed(1), yP = (yel/t*100).toFixed(1), gP = (grn/t*100).toFixed(1);
+    document.getElementById('crets-bar').innerHTML = `
+      <span class="crets-label">CRETS Backlog</span>
+      <span class="crets-stat"><strong>${act.length}</strong> actionable</span>
+      <span class="crets-stat" style="opacity:.6"><strong>${nonact.length}</strong> non-act</span>
+      <span class="crets-stat">Red: <strong>${red}</strong></span>
+      <span class="crets-stat">Yellow: <strong>${yel}</strong></span>
+      <span class="crets-stat">Green: <strong>${grn}</strong></span>
+      <div class="crets-bar-visual">
+        <div class="crets-seg" style="width:${rP}%;background:#e53e3e">${red>0?red:''}</div>
+        <div class="crets-seg" style="width:${yP}%;background:#d69e2e">${yel>0?yel:''}</div>
+        <div class="crets-seg" style="width:${gP}%;background:#38a169">${grn>0?grn:''}</div>
+      </div>`;
+  }
+
+  // --- Table ---
+  function buildHead() {
+    const tr = document.getElementById('table-head');
+    tr.innerHTML = COLUMNS.map(c => {
+      const arrow = sortCol === c.key ? (sortAsc ? ' ▲' : ' ▼') : '';
+      return `<th data-col="${c.key}">${c.label}<span class="sort-arrow">${arrow}</span></th>`;
+    }).join('');
+    tr.querySelectorAll('th').forEach(th => {
+      th.onclick = () => {
+        const col = th.dataset.col;
+        if (sortCol === col) sortAsc = !sortAsc; else { sortCol = col; sortAsc = true; }
+        applySort(); buildHead(); renderBody();
+      };
+    });
+  }
+
+  function renderBody() {
+    const tbody = document.getElementById('table-body');
+    tbody.innerHTML = filtered.map((r, i) => {
+      const cls = [
+        r.overall_status === 'RED' ? 'row-red' : r.overall_status === 'YELLOW' ? 'row-yellow' : '',
+        r.isactionable !== 'Y' ? 'row-nonact' : ''
+      ].join(' ').trim();
+      return `<tr class="${cls}" data-idx="${i}">${COLUMNS.map(c =>
+        `<td class="${['num0','num1','comma','days','boost'].includes(c.fmt)?'num':''}">${fmtCell(r,c)}</td>`
+      ).join('')}</tr>`;
+    }).join('');
+    tbody.querySelectorAll('tr').forEach(tr => {
+      tr.onclick = () => showDetail(filtered[+tr.dataset.idx]);
+    });
+    document.getElementById('row-count').textContent = `Showing ${filtered.length.toLocaleString()} of ${allData.length.toLocaleString()} trailers`;
+  }
+
+  function fmtCell(r, c) {
+    const v = r[c.key];
+    switch (c.fmt) {
+      case 'color': {
+        const cls = v === 'RED' ? 'bg-red' : v === 'YELLOW' ? 'bg-yellow' : 'bg-green';
+        return `<span class="badge ${cls}">${v}</span>`;
+      }
+      case 'num0': return (+v).toLocaleString(undefined,{maximumFractionDigits:0});
+      case 'num1': return (+v).toLocaleString(undefined,{maximumFractionDigits:1});
+      case 'comma': return (+v).toLocaleString();
+      case 'days': {
+        const x = +v;
+        if (x >= 999) return '<span class="badge-gray">N/A</span>';
+        return `<span style="color:${x<=0?'#fc8181':x<=2?'#fbd38d':'#9ae6b4'};font-weight:600">${x.toFixed(2)}${x<=0?' 🔴':x<=2?' ⚠️':''}</span>`;
+      }
+      case 'flag': return v === 'Y' ? '<span class="flag-y">⚠ YES</span>' : '<span class="flag-n">—</span>';
+      case 'actionable': return v === 'Y' ? '<span class="act-y">✔ YES</span>' : '<span class="act-n">NO</span>';
+      case 'boost': {
+        const x = +v;
+        if (x === 0) return '<span class="flag-n">—</span>';
+        const cls = x >= 500 ? 'flag-y' : x >= 100 ? 'boost-warn' : 'boost-low';
+        return `<span class="${cls}">+${x.toLocaleString()}</span>`;
+      }
+      case 'datetime': return v || '';
+      default: return v ?? '';
+    }
+  }
+
+  // --- Filters ---
+  function applyFilters() {
+    const statuses = [...document.querySelectorAll('#filter-status input:checked')].map(i => i.value);
+    const ttsOnly = document.getElementById('filter-tts-expired').checked;
+    const arOnly = document.getElementById('filter-atrisk').checked;
+    const actFilter = document.getElementById('filter-actionable').value;
+    const carrier = document.getElementById('filter-carrier').value;
+    const sortType = document.getElementById('filter-sort-type').value;
+    filtered = allData.filter(r => {
+      if (!statuses.includes(r.overall_status)) return false;
+      if (actFilter === 'Y' && r.isactionable !== 'Y') return false;
+      if (actFilter === 'N' && r.isactionable === 'Y') return false;
+      if (ttsOnly && r.tts_expired_flag !== 'Y') return false;
+      if (arOnly && r.days_until_red > 2) return false;
+      if (carrier && r.carrier !== carrier) return false;
+      if (sortType && (r.rome_trailer_sort_type || '') !== sortType) return false;
+      return true;
+    });
+    applySort(); renderSummary(); renderCRETSBar(); buildHead(); renderBody();
+  }
+
+  function applySort() {
+    filtered.sort((a, b) => {
+      let va = a[sortCol], vb = b[sortCol];
+      if (typeof va === 'number' && typeof vb === 'number') return sortAsc ? va - vb : vb - va;
+      va = String(va ?? ''); vb = String(vb ?? '');
+      return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+    });
+  }
+
+  function populateFilters() {
+    const mk = (id, key) => {
+      const vals = [...new Set(allData.map(r => r[key]))].filter(Boolean).sort();
+      const sel = document.getElementById(id);
+      const lbl = sel.options[0].text;
+      sel.innerHTML = `<option value="">${lbl}</option>` + vals.map(v => `<option>${v}</option>`).join('');
+    };
+    mk('filter-carrier', 'carrier');
+    mk('filter-sort-type', 'rome_trailer_sort_type');
+  }
+
+  function resetFilters() {
+    document.querySelectorAll('#filter-status input').forEach(i => i.checked = true);
+    document.getElementById('filter-actionable').value = '';
+    document.getElementById('filter-tts-expired').checked = false;
+    document.getElementById('filter-atrisk').checked = false;
+    document.getElementById('filter-carrier').value = '';
+    document.getElementById('filter-sort-type').value = '';
+    sortCol = 'days_until_red'; sortAsc = true;
+    applyFilters();
+  }
+
+  // --- Detail ---
+  function showDetail(r) {
+    const panel = document.getElementById('detail-content');
+    const ohtPct = Math.max(0, Math.min(100, (r.trailer_dwell_days / 9) * 100));
+    const ohtColor = r.days_until_red <= 0 ? '#e53e3e' : r.days_until_red <= 2 ? '#d69e2e' : '#38a169';
+    const ttsF = r.tts_dwell_factor || (r.tts_units_expired*2.5 + n(r.tts_units_expiring_today)*1.15 + n(r.tts_units_expiring_next_3_days)*0.8 + n(r.fba_dollars_expiring_in_4_7_days)*0.40 + n(r.tts_units_expiring_after_7_days)*0.15);
+    const fbaF = r.fba_risk_factor || (n(r.fba_dollars_expiring_today)*3.0 + n(r.fba_dollars_expiring_next_3_days)*1.289 + n(r.fba_dollars_expiring_in_4_7_days)*0.55);
+    const total = (r.dwell_only_factor || dwellFactor(r.trailer_dwell_days)) + ttsF + fbaF;
+    const pct = v => total > 0 ? Math.max(5, (v / total) * 100) : 33;
+    const tmrw = r.days_until_red - 1;
+    const tmrwS = tmrw <= 0 ? 'RED' : tmrw <= 2 ? 'YELLOW' : 'GREEN';
+
+    panel.innerHTML = `
+      <h2>${r.equipment_number} <span class="badge ${r.overall_status==='RED'?'bg-red':r.overall_status==='YELLOW'?'bg-yellow':'bg-green'}">${r.overall_status}</span></h2>
+      <h3>Trailer Info</h3>
+      <dl class="detail-grid">
+        <dt>Carrier</dt><dd>${r.carrier||'—'}</dd>
+        <dt>Owner</dt><dd>${r.owner||'—'}</dd>
+        <dt>Yard Location</dt><dd>${r.yard_location||'—'}</dd>
+        <dt>Arrived</dt><dd>${r.arrival_time_local||'—'}</dd>
+        <dt>Dwell Days</dt><dd>${r.trailer_dwell_days}</dd>
+        <dt>T-Score</dt><dd>${r.rome_tscore.toLocaleString()}</dd>
+        <dt>Sort Type</dt><dd>${r.rome_trailer_sort_type||r.sdn_trailer_sort_type||'—'}</dd>
+        <dt>Product Family</dt><dd>${r.rome_trailer_product_family||'—'}</dd>
+        <dt>Dock Note</dt><dd>${r.standarddocknote||'—'}</dd>
+        <dt>Yard Notes</dt><dd>${r.yard_notes||'—'}</dd>
+      </dl>
+      <h3>Dwell Progress (Red @ Day 9)</h3>
+      <div class="countdown-bar"><div class="countdown-fill" style="width:${ohtPct}%;background:${ohtColor}">Day ${r.trailer_dwell_days.toFixed(1)} — ${r.days_until_red.toFixed(1)}d to red</div></div>
+      <h3>T-Score Breakdown</h3>
+      <div class="score-bar">
+        <div class="bar-dwell" style="width:${pct(r.dwell_only_factor)}%">Dwell ${r.dwell_only_factor.toLocaleString()}</div>
+        <div class="bar-tts" style="width:${pct(r.tts_dwell_factor)}%">TTS ${r.tts_dwell_factor.toLocaleString()}</div>
+        <div class="bar-fba" style="width:${pct(r.fba_risk_factor)}%">FBA ${r.fba_risk_factor.toLocaleString()}</div>
+      </div>
+      <p style="font-size:.82rem;color:#718096">Total: ${total.toLocaleString()}</p>
+      <h3>Inventory</h3>
+      <table class="detail-table">
+        <tr><th>Metric</th><th>Value</th></tr>
+        <tr><td style="text-align:left">Total Units</td><td>${r.total_units.toLocaleString()}</td></tr>
+        <tr><td style="text-align:left">TTS Units</td><td>${(+r.tts_units).toLocaleString()}</td></tr>
+        <tr><td style="text-align:left">FBA Units</td><td>${(+r.fba_units).toLocaleString()}</td></tr>
+        <tr><td style="text-align:left">TTS Expired</td><td>${r.tts_units_expired.toLocaleString()}</td></tr>
+        <tr><td style="text-align:left">TTS Expiring Today</td><td>${n(r.tts_units_expiring_today).toLocaleString()}</td></tr>
+        <tr><td style="text-align:left">TTS Expiring 3d</td><td>${n(r.tts_units_expiring_next_3_days).toLocaleString()}</td></tr>
+      </table>
+      <h3>Prediction</h3>
+      <div class="prediction-box">
+        <p>⏱ <strong>Days Until Red:</strong> ${r.days_until_red.toFixed(1)} days ${r.days_until_red <= 2 ? '⚠️' : ''}</p>
+        <p>📊 <strong>Current T-Score:</strong> ${r.rome_tscore.toLocaleString()} (Dwell: ${r.dwell_only_factor || dwellFactor(r.trailer_dwell_days)} + TTS: ${Math.round(ttsF)} + FBA: ${Math.round(fbaF)})</p>
+        <p>📈 <strong>Tomorrow:</strong> <span class="badge ${r._proj_status==='RED'?'bg-red':r._proj_status==='YELLOW'?'bg-yellow':'bg-green'}">${r._proj_status}</span> — T-Score ${r._proj_score.toLocaleString()}</p>
+        ${r.tts_accelerated ? '<p>🚨 <strong>TTS/FBA Acceleration:</strong> +' + r.tts_fba_boost.toLocaleString() + ' points from content risk — this trailer will hit red FASTER than dwell alone</p>' : ''}
+      </div>
+      <h3>Dwell Curve Projection</h3>
+      <table class="detail-table">
+        <tr><th>Day</th><th>Dwell Pts</th><th>+TTS/FBA</th><th>Total</th><th>Status</th></tr>
+        ${dwellProjection(r.trailer_dwell_days, ttsF, fbaF)}
+      </table>`;
+    document.getElementById('detail-overlay').classList.remove('hidden');
+  }
+
+  function dwellProjection(currentDwell, ttsF, fbaF) {
+    let html = '';
+    const start = Math.max(0, Math.floor(currentDwell) - 1);
+    const end = Math.min(15, Math.floor(currentDwell) + 6);
+    for (let d = start; d <= end; d++) {
+      const df = dwellFactor(d);
+      const total = df + ttsF + fbaF;
+      const status = total >= 3550 ? 'RED' : total >= 350 ? 'YELLOW' : 'GREEN';
+      const cls = status === 'RED' ? 'bg-red' : status === 'YELLOW' ? 'bg-yellow' : 'bg-green';
+      const isCurrent = d === Math.floor(currentDwell);
+      const marker = isCurrent ? ' ◄ now' : '';
+      html += `<tr${isCurrent ? ' style="background:rgba(233,69,96,.15)"' : ''}>
+        <td style="text-align:left">Day ${d}${marker}</td>
+        <td>${df.toLocaleString()}</td>
+        <td>+${Math.round(ttsF + fbaF).toLocaleString()}</td>
+        <td>${Math.round(total).toLocaleString()}</td>
+        <td><span class="badge ${cls}">${status}</span></td>
+      </tr>`;
+    }
+    return html;
+  }
+
+  // --- Export ---
+  function exportCSV() {
+    if (!filtered.length) return;
+    const keys = COLUMNS.map(c => c.key);
+    const labels = COLUMNS.map(c => c.label);
+    const lines = [labels.join(',')];
+    filtered.forEach(r => {
+      lines.push(keys.map(k => {
+        let v = String(r[k] ?? '');
+        if (v.includes(',') || v.includes('"') || v.includes('\n')) v = '"' + v.replace(/"/g, '""') + '"';
+        return v;
+      }).join(','));
+    });
+    const date = new Date().toISOString().slice(0, 10);
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `rome_crets_PHX6_${date}.csv`; a.click();
+  }
+
+  // --- Init ---
+  function handleFile(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const rows = parseCSV(e.target.result);
+        if (!rows.length) { showError('CSV parsed but 0 rows found.'); return; }
+        const keys = Object.keys(rows[0]);
+        console.log('CSV columns mapped:', keys);
+        const need = ['equipment_number'];
+        const hasDwell = ('trailer_dwell_days' in rows[0]) || ('dwell_hours' in rows[0]);
+        const missing = need.filter(k => !(k in rows[0]));
+        if (!hasDwell) missing.push('trailer_dwell_days or dwell_hours');
+        if (missing.length) {
+          showError('CSV missing columns: ' + missing.join(', ') + '\n\nFound: ' + keys.join(', '));
+          return;
+        }
+        allData = rows.map(processRow);
+        sortCol = 'days_until_red'; sortAsc = true;
+        document.getElementById('upload-section').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        populateFilters(); applyFilters();
+      } catch (err) { showError('Error: ' + err.message); console.error(err); }
+    };
+    reader.onerror = () => showError('Failed to read file.');
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  function showError(msg) {
+    document.getElementById('freshness').innerHTML = `<div class="warning-banner">❌ ${msg.split('\n')[0]}</div>`;
+    alert(msg);
+  }
+
+  // Events
+  document.getElementById('file-input').addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+  const dz = document.getElementById('drop-zone');
+  dz.addEventListener('click', () => document.getElementById('file-input').click());
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('dragover'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+  document.querySelectorAll('#filter-status input').forEach(i => i.addEventListener('change', applyFilters));
+  document.getElementById('filter-actionable').addEventListener('change', applyFilters);
+  document.getElementById('daily-plan-input').addEventListener('input', updateCretBacklog);
+  document.getElementById('filter-tts-expired').addEventListener('change', applyFilters);
+  document.getElementById('filter-atrisk').addEventListener('change', applyFilters);
+  document.getElementById('filter-carrier').addEventListener('change', applyFilters);
+  document.getElementById('filter-sort-type').addEventListener('change', applyFilters);
+  document.getElementById('btn-export').addEventListener('click', exportCSV);
+  document.getElementById('btn-reset').addEventListener('click', resetFilters);
+  document.getElementById('detail-close').addEventListener('click', () => document.getElementById('detail-overlay').classList.add('hidden'));
+  document.getElementById('detail-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.add('hidden'); });
+})();
+
+</script>
+<script>
+(function () {
+  'use strict';
+
+  let ymsData = [], ymsFiltered = [], ymsSortCol = 'time_in_yard_hours', ymsSortAsc = false;
+  let uptStdVal = 0, uptShuttleVal = 0;
+
+  const YMS_HEADER_MAP = {
+    'location': 'location', 'type': 'vehicle_type', 'time in yard': 'time_in_yard_raw',
+    'visit reason': 'visit_reason', 'owner (operator)': 'owner', 'owner_operator': 'owner',
+    'vehicle id': 'vehicle_id', 'load identifier(s)': 'load_ids', 'load_identifier_s': 'load_ids',
+    'seal': 'seal', 'notes': 'notes',
+    'equipment number': 'vehicle_id', 'latest yard location': 'location',
+    'latest yard event type': 'latest_event_type', 'yard notes': 'notes',
+    'carrier': 'owner', 'trailer dwell days': 'trailer_dwell_days',
+    'rome t-score': 'rome_tscore', 'arrival time (local)': 'arrival_time_local',
+    'standard dock note': 'dock_note', 'is actionable': 'isactionable',
+  };
+
+  const YMS_COLUMNS = [
+    { key: 'loc_type', label: 'Loc', fmt: 'loctype' },
+    { key: 'location', label: 'Position' },
+    { key: 'vehicle_id', label: 'Vehicle' },
+    { key: 'time_in_yard_hours', label: 'Time in Yard', fmt: 'hours' },
+    { key: 'days_until_red', label: 'Days to Red', fmt: 'daysred' },
+    { key: 'rome_tscore', label: 'T-Score', fmt: 'tscore' },
+    { key: 'total_units', label: 'Units', fmt: 'num' },
+    { key: 'tts_at_risk_3d', label: 'TTS @Risk', fmt: 'risk' },
+    { key: 'tts_expired_flag', label: 'TTS Exp', fmt: 'flag' },
+    { key: 'category', label: 'Category', fmt: 'category' },
+    { key: 'owner', label: 'Owner' },
+    { key: 'visit_reason', label: 'Reason', fmt: 'reason' },
+    { key: 'vehicle_type', label: 'Type' },
+  ];
+
+  // --- Dwell factor curve (same as Tab 1) ---
+  function dwellFactor(days) {
+    if (days <= 0) return 15;
+    if (days <= 3) return days * 50;
+    if (days <= 5) return 150 + (days - 3) * 100;
+    if (days === 6) return 350 + (days - 5) * 200;
+    if (days <= 9) return 550 + (days - 6) * 1000;
+    if (days <= 11) return 3550 + (days - 9) * 2000;
+    if (days <= 13) return 7550 + (days - 10) * 3000;
+    return 13550 + (Math.min(days, 30) - 13) * 4000;
+  }
+
+  function daysUntilRed(dwellDays, ttsF, fbaF) {
+    for (let d = Math.ceil(dwellDays); d <= 30; d++) {
+      if (dwellFactor(d) + ttsF + fbaF >= 3550) return Math.max(0, d - dwellDays);
+    }
+    return Math.max(0, 30 - dwellDays);
+  }
+
+  // --- CSV ---
+  function parseCSV(text) {
+    if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+    const firstLine = text.split(/\r?\n/)[0];
+    const delim = (firstLine.split('\t').length > firstLine.split(',').length) ? '\t' : ',';
+    const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+    if (lines.length < 2) return [];
+    const rawHeaders = parseLine(lines[0], delim);
+    const headers = rawHeaders.map(h => {
+      const clean = h.trim().toLowerCase();
+      return YMS_HEADER_MAP[clean] || clean.replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+    });
+    const rows = [];
+    for (let i = 1; i < lines.length; i++) {
+      if (!lines[i].trim()) continue;
+      const vals = parseLine(lines[i], delim);
+      const row = {};
+      headers.forEach((h, j) => { row[h] = (vals[j] || '').trim(); });
+      rows.push(row);
+    }
+    return rows;
+  }
+
+  function parseLine(line, delim) {
+    if (!delim) delim = '\t';
+    const r = []; let c = '', q = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (q) { if (ch === '"' && line[i + 1] === '"') { c += '"'; i++; } else if (ch === '"') q = false; else c += ch; }
+      else { if (ch === '"') q = true; else if (ch === delim) { r.push(c); c = ''; } else c += ch; }
+    }
+    r.push(c); return r;
+  }
+
+  function parseTimeInYard(raw) {
+    if (!raw) return 0;
+    let h = 0;
+    const d = raw.match(/(\d+)\s*day/i), hr = raw.match(/(\d+)\s*hour/i), m = raw.match(/(\d+)\s*minute/i);
+    if (d) h += parseInt(d[1]) * 24;
+    if (hr) h += parseInt(hr[1]);
+    if (m) h += parseInt(m[1]) / 60;
+    return Math.round(h * 10) / 10;
+  }
+
+  function n(v) { const x = parseFloat(v); return isNaN(x) ? 0 : x; }
+
+  function processRow(r) {
+    if (!r.vehicle_id && !r.vehicle_type) return null;
+
+    r.time_in_yard_hours = parseTimeInYard(r.time_in_yard_raw);
+    r.time_in_yard_days = Math.round(r.time_in_yard_hours / 24 * 10) / 10;
+
+    // Location type
+    const loc = (r.location || '').toUpperCase();
+    if (loc.match(/^DD\d/)) r.loc_type = 'DOCK';
+    else if (loc.match(/^(WS|PS)\d/)) r.loc_type = 'YARD';
+    else if (loc.includes('PROBLEM')) r.loc_type = 'PROB SOLVE';
+    else if (loc.includes('LOWERBUCKEYE') || loc.includes('5215')) r.loc_type = 'OVERFLOW';
+    else r.loc_type = 'OTHER';
+
+    // Category from notes
+    const notes = (r.notes || '').toUpperCase();
+    if (/CRET|PHX6SRHL/.test(notes)) r.category = 'CRET';
+    else if (/APSTORAGE|NISTORAGE|NONAPSTORAGE/.test(notes)) r.category = 'STORAGE';
+    else if (/YELLOW.?TAG|RED.?TAG|PHX6TAG/.test(notes)) r.category = 'TAGGED';
+    else if (/WASTE/.test(notes)) r.category = 'WASTE';
+    else if (/MISSHIP|IBMISSHIP/.test(notes)) r.category = 'MISSHIP';
+    else if (/EMPTY/.test(notes)) r.category = 'EMPTY';
+    else if (/OBRTD|OBSCHED/.test(notes)) r.category = 'OUTBOUND';
+    else if (/NITOTES|NIUPP|NIWOOD/.test(notes)) r.category = 'NI-INBOUND';
+    else if (/IBUNSELL/.test(notes)) r.category = 'UNSELL';
+    else if (/IBVEND/.test(notes)) r.category = 'VENDOR';
+    else r.category = '—';
+
+    r.is_cret = r.category === 'CRET';
+    r.is_empty = r.category === 'EMPTY';
+    r.is_tagged = r.category === 'TAGGED';
+    r.is_storage = r.category === 'STORAGE' || r.category === 'WASTE';
+    r.is_operational = !r.is_storage && r.category !== 'WASTE';
+    r.is_shuttle_bag = r.is_cret && /shuttle|bag/i.test(r.notes || '');
+
+    const WORKING_DOORS = ['DD5','DD8','DD18','DD20','DD23','DD88','DD90'];
+    r.at_working_door = WORKING_DOORS.includes((r.location || '').toUpperCase());
+
+    // Tag detail
+    if (r.is_tagged) {
+      const issueMatch = (r.notes || '').match(/ISSUE:\s*([^\n]+)/i);
+      r.tag_reason = issueMatch ? issueMatch[1].trim() : 'Unknown';
+      r.days_tagged = r.time_in_yard_days;
+    }
+
+    // Visit reason cleanup
+    r.visit_reason = (r.visit_reason || '').replace(/GLOBAL:VISIT_REASON:null/g, '—').replace(/GLOBAL:VISIT_REASON:/g, '');
+
+    // Defaults for ROME fields (will be enriched if Tab 1 data exists)
+    r.rome_tscore = 0;
+    r.days_until_red = -1;
+    r.total_units = 0;
+    r.tts_units = 0;
+    r.tts_at_risk_3d = 0;
+    r.tts_expired_flag = 'N';
+    r.tts_dwell_factor = 0;
+    r.fba_risk_factor = 0;
+
+    return r;
+  }
+
+  // Cross-reference with Tab 1 ROME data
+  function enrichFromTab1() {
+    const tsData = window.getTScoreData ? window.getTScoreData() : [];
+    if (!tsData.length) return;
+    const lookup = {};
+    tsData.forEach(r => {
+      const id = (r.equipment_number || '').toUpperCase().trim();
+      if (id) lookup[id] = r;
+    });
+    let matched = 0;
+    ymsData.forEach(r => {
+      const id = (r.vehicle_id || '').toUpperCase().trim();
+      const ts = lookup[id];
+      if (ts) {
+        matched++;
+        r.rome_tscore = ts.rome_tscore || 0;
+        r.total_units = ts.total_units || 0;
+        r.tts_units = ts.tts_units || 0;
+        r.tts_at_risk_3d = ts.tts_at_risk_3d || 0;
+        r.tts_expired_flag = ts.tts_expired_flag || 'N';
+        r.tts_dwell_factor = ts.tts_dwell_factor || 0;
+        r.fba_risk_factor = ts.fba_risk_factor || 0;
+        r.days_until_red = ts.days_until_red != null ? ts.days_until_red : -1;
+        r.isactionable_rome = ts.isactionable || '';
+      }
+    });
+    // For trailers not in ROME, estimate from dwell
+    ymsData.forEach(r => {
+      if (r.days_until_red < 0 && r.time_in_yard_days > 0 && r.is_operational) {
+        r.days_until_red = Math.round(daysUntilRed(r.time_in_yard_days, 0, 0) * 10) / 10;
+        r.rome_tscore = dwellFactor(Math.floor(r.time_in_yard_days));
+      }
+    });
+    console.log(`YMS enriched: ${matched}/${ymsData.length} matched to ROME data`);
+  }
+
+  // --- Rendering ---
+  function renderSummary() {
+    const t = ymsFiltered.length;
+    const dock = ymsFiltered.filter(r => r.loc_type === 'DOCK').length;
+    const yard = ymsFiltered.filter(r => r.loc_type === 'YARD').length;
+    const overflow = ymsFiltered.filter(r => r.loc_type === 'OVERFLOW').length;
+    const crets = ymsFiltered.filter(r => r.is_cret).length;
+    const empty = ymsFiltered.filter(r => r.is_empty).length;
+    const tagged = ymsFiltered.filter(r => r.is_tagged).length;
+    const ttsRisk = ymsFiltered.filter(r => r.tts_at_risk_3d > 0).length;
+    const near_red = ymsFiltered.filter(r => r.days_until_red >= 0 && r.days_until_red <= 2).length;
+    document.getElementById('yms-summary-cards').innerHTML = [
+      card('Total', t, 'card-dark'),
+      card('📍 Dock', dock, 'card-green'),
+      card('🏗 Yard', yard, 'card-blue'),
+      card('🔄 Overflow', overflow, 'card-dark'),
+      card('🚛 CRETs', crets, 'card-blue'),
+      card('📦 Empty', empty, 'card-dark'),
+      card('🏷 Tagged', tagged, 'card-orange'),
+      card('⚠ Near Red (≤2d)', near_red, 'card-red'),
+      card('🔥 TTS @Risk', ttsRisk, 'card-red'),
+    ].join('');
+
+    // CRET backlog calculation
+    const WORKING_DOORS = ['DD5','DD8','DD18','DD20','DD23','DD88','DD90'];
+    const ymsCrets = ymsData.filter(r => r.is_cret);
+    const ymsCretCount = ymsCrets.length;
+    const atWorkingDoor = ymsCrets.filter(r => WORKING_DOORS.includes(r.location.toUpperCase()));
+    const notWorking = ymsCrets.filter(r => !WORKING_DOORS.includes(r.location.toUpperCase()));
+    const shuttleBag = notWorking.filter(r => /shuttle|bag/i.test(r.notes || ''));
+    const standard = notWorking.filter(r => !/shuttle|bag/i.test(r.notes || ''));
+
+    const backlogUnits = (standard.length * uptStdVal) + (shuttleBag.length * uptShuttleVal);
+
+    const bar = document.getElementById('yms-cret-bar');
+    bar.innerHTML = `
+      <div class="backlog-section">
+        <span class="crets-label">🚛 CRET Backlog</span>
+        <span class="crets-stat">Total CRETs: <strong>${ymsCretCount}</strong></span>
+        <span class="crets-stat">🔧 Working Doors: <strong class="loc-dock">${atWorkingDoor.length}</strong></span>
+        <span class="crets-stat">⏳ Waiting: <strong style="color:#fbd38d">${notWorking.length}</strong> (${standard.length} std + ${shuttleBag.length} shuttle/bag)</span>
+      </div>
+      <div class="backlog-section">
+        <span class="filter-label">UPT Std:</span>
+        <input type="number" id="yms-upt-standard" min="1" value="${uptStdVal || ''}" placeholder="e.g. 16639" class="upt-input">
+        <span class="filter-label">Shuttle:</span>
+        <input type="number" id="yms-upt-shuttle" min="1" value="${uptShuttleVal || ''}" placeholder="e.g. 8500" class="upt-input">
+      </div>
+      <div class="backlog-section">
+        ${uptStdVal > 0 ? `<span class="crets-stat">Backlog: <strong style="color:#e94560;font-size:1.1rem">${backlogUnits.toLocaleString()} units</strong></span>
+        <span class="crets-stat" style="font-size:.78rem;color:#a0aec0">(${standard.length}×${uptStdVal.toLocaleString()} + ${shuttleBag.length}×${uptShuttleVal.toLocaleString()})</span>`
+        : `<span style="color:#718096;font-size:.82rem">Enter UPT from RELO IPT tab</span>`}
+      </div>
+    `;
+    bar.style.cssText = 'background:linear-gradient(135deg,#1a3a6a,#0f3460);border:1px solid #63b3ed;border-radius:10px;padding:14px 18px;margin-bottom:12px;display:flex;gap:16px;align-items:center;flex-wrap:wrap';
+    document.getElementById('yms-upt-standard').addEventListener('input', e => { uptStdVal = parseFloat(e.target.value) || 0; renderSummary(); });
+    document.getElementById('yms-upt-shuttle').addEventListener('input', e => { uptShuttleVal = parseFloat(e.target.value) || 0; renderSummary(); });
+  }
+
+  function card(l, v, c) {
+    return `<div class="card ${c}"><div class="card-val">${v}</div><div class="card-label">${l}</div></div>`;
+  }
+
+  function buildHead() {
+    const tr = document.getElementById('yms-table-head');
+    tr.innerHTML = YMS_COLUMNS.map(c => {
+      const arrow = ymsSortCol === c.key ? (ymsSortAsc ? ' ▲' : ' ▼') : '';
+      return `<th data-col="${c.key}">${c.label}<span class="sort-arrow">${arrow}</span></th>`;
+    }).join('');
+    tr.querySelectorAll('th').forEach(th => {
+      th.onclick = () => {
+        const col = th.dataset.col;
+        if (ymsSortCol === col) ymsSortAsc = !ymsSortAsc; else { ymsSortCol = col; ymsSortAsc = true; }
+        applySort(); buildHead(); renderBody();
+      };
+    });
+  }
+
+  function renderBody() {
+    const tbody = document.getElementById('yms-table-body');
+    tbody.innerHTML = ymsFiltered.map((r, i) => {
+      const cls = r.is_storage ? 'row-nonact' : r.is_tagged ? 'row-tagged' : r.days_until_red >= 0 && r.days_until_red <= 2 ? 'row-red' : '';
+      return `<tr class="${cls}" data-idx="${i}">${YMS_COLUMNS.map(c =>
+        `<td class="${['hours','daysred','tscore','num','risk'].includes(c.fmt)?'num':''}">${fmtCell(r,c)}</td>`
+      ).join('')}</tr>`;
+    }).join('');
+    tbody.querySelectorAll('tr').forEach(tr => {
+      tr.onclick = () => showDetail(ymsFiltered[+tr.dataset.idx]);
+    });
+    document.getElementById('yms-row-count').textContent = `Showing ${ymsFiltered.length} of ${ymsData.length} vehicles`;
+  }
+
+  function fmtCell(r, c) {
+    const v = r[c.key];
+    switch (c.fmt) {
+      case 'loctype': {
+        const m = { 'DOCK':'loc-dock','YARD':'loc-yard','OVERFLOW':'boost-warn','PROB SOLVE':'flag-y' };
+        return `<span class="${m[v]||'loc-unknown'}">${v}</span>`;
+      }
+      case 'hours': {
+        const h = +v;
+        if (h >= 168) return `<span class="stale-yes">${(h/24).toFixed(1)}d 🔴</span>`;
+        if (h >= 48) return `<span class="boost-warn">${(h/24).toFixed(1)}d</span>`;
+        return `${h.toFixed(1)}h`;
+      }
+      case 'daysred': {
+        if (v < 0) return '<span class="flag-n">—</span>';
+        if (v <= 0) return '<span class="stale-yes">NOW 🔴</span>';
+        if (v <= 2) return `<span class="stale-yes">${v.toFixed(1)}d ⚠</span>`;
+        return `<span class="boost-low">${v.toFixed(1)}d</span>`;
+      }
+      case 'tscore': return v > 0 ? `<span style="color:${v>=3550?'#fc8181':v>=350?'#fbd38d':'#9ae6b4'}">${v.toLocaleString()}</span>` : '<span class="flag-n">—</span>';
+      case 'num': return v > 0 ? v.toLocaleString() : '<span class="flag-n">—</span>';
+      case 'risk': return v > 0 ? `<span class="flag-y">${v.toLocaleString()} ⚠</span>` : '<span class="flag-n">—</span>';
+      case 'flag': return v === 'Y' ? '<span class="flag-y">⚠ YES</span>' : '<span class="flag-n">—</span>';
+      case 'category': {
+        const colors = { 'CRET':'loc-dock','TAGGED':'flag-y','STORAGE':'loc-unknown','WASTE':'loc-unknown','EMPTY':'flag-n','OUTBOUND':'boost-low','MISSHIP':'boost-warn' };
+        return `<span class="${colors[v]||''}">${v}</span>`;
+      }
+      case 'reason': return v === '—' ? '<span class="flag-n">—</span>' : v;
+      default: return v ?? '';
+    }
+  }
+
+  // --- Filters ---
+  function applyFilters() {
+    const loc = document.getElementById('yms-filter-location').value;
+    const cat = document.getElementById('yms-filter-category').value;
+    const owner = document.getElementById('yms-filter-owner').value;
+    const stale = document.getElementById('yms-filter-stale').checked;
+    const hideStorage = document.getElementById('yms-filter-hide-storage').checked;
+    ymsFiltered = ymsData.filter(r => {
+      if (loc && r.loc_type !== loc) return false;
+      if (cat && r.category !== cat.toUpperCase() && !(cat === 'loaded' && r.is_operational && !r.is_empty)) return false;
+      if (cat === 'loaded' && (r.is_empty || r.is_storage)) return false;
+      if (owner && r.owner !== owner) return false;
+      if (stale && !(r.days_until_red >= 0 && r.days_until_red <= 2)) return false;
+      if (hideStorage && r.is_storage) return false;
+      return true;
+    });
+    applySort(); renderSummary(); buildHead(); renderBody();
+  }
+
+  function applySort() {
+    ymsFiltered.sort((a, b) => {
+      let va = a[ymsSortCol], vb = b[ymsSortCol];
+      if (typeof va === 'number' && typeof vb === 'number') return ymsSortAsc ? va - vb : vb - va;
+      va = String(va ?? ''); vb = String(vb ?? '');
+      return ymsSortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+    });
+  }
+
+  function populateFilters() {
+    const owners = [...new Set(ymsData.map(r => r.owner))].filter(Boolean).sort();
+    document.getElementById('yms-filter-owner').innerHTML = '<option value="">All Owners</option>' + owners.map(o => `<option>${o}</option>`).join('');
+    const cats = [...new Set(ymsData.map(r => r.category))].filter(c => c !== '—').sort();
+    const catSel = document.getElementById('yms-filter-category');
+    catSel.innerHTML = '<option value="">All Categories</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+  }
+
+  // --- Detail ---
+  function showDetail(r) {
+    const panel = document.getElementById('detail-content');
+    const locCls = { 'DOCK':'loc-dock','YARD':'loc-yard','OVERFLOW':'boost-warn' };
+    const hasRome = r.rome_tscore > 0;
+
+    panel.innerHTML = `
+      <h2>${r.vehicle_id} <span class="${locCls[r.loc_type]||'loc-unknown'}">${r.loc_type} — ${r.location}</span></h2>
+      <h3>Vehicle</h3>
+      <dl class="detail-grid">
+        <dt>Type</dt><dd>${r.vehicle_type||'—'}</dd>
+        <dt>Owner</dt><dd>${r.owner||'—'}</dd>
+        <dt>Category</dt><dd>${r.category}</dd>
+        <dt>Time in Yard</dt><dd>${r.time_in_yard_days.toFixed(1)} days (${r.time_in_yard_hours.toFixed(1)}h)</dd>
+        <dt>Visit Reason</dt><dd>${r.visit_reason}</dd>
+        <dt>Load IDs</dt><dd>${r.load_ids||'—'}</dd>
+        <dt>Seal</dt><dd>${r.seal||'—'}</dd>
+      </dl>
+      ${r.is_tagged ? `<h3>🏷 Tag Details</h3><dl class="detail-grid"><dt>Reason</dt><dd><span class="flag-y">${r.tag_reason||'Unknown'}</span></dd><dt>Days Tagged</dt><dd>${r.days_tagged.toFixed(1)} days</dd></dl>` : ''}
+      ${hasRome ? `
+      <h3>ROME Data (from Tab 1)</h3>
+      <dl class="detail-grid">
+        <dt>T-Score</dt><dd style="color:${r.rome_tscore>=3550?'#fc8181':r.rome_tscore>=350?'#fbd38d':'#9ae6b4'}">${r.rome_tscore.toLocaleString()}</dd>
+        <dt>Days to Red</dt><dd style="color:${r.days_until_red<=2?'#fc8181':'#9ae6b4'}">${r.days_until_red.toFixed(1)} days</dd>
+        <dt>Total Units</dt><dd>${r.total_units.toLocaleString()}</dd>
+        <dt>TTS Units</dt><dd>${r.tts_units.toLocaleString()}</dd>
+        <dt>TTS @Risk 3d</dt><dd>${r.tts_at_risk_3d > 0 ? '<span class="flag-y">' + r.tts_at_risk_3d.toLocaleString() + ' ⚠</span>' : '0'}</dd>
+        <dt>TTS Expired</dt><dd>${r.tts_expired_flag === 'Y' ? '<span class="flag-y">⚠ YES</span>' : 'No'}</dd>
+      </dl>` : `
+      <h3>ROME Data</h3>
+      <p style="color:#718096;font-size:.85rem">${r.is_operational ? 'Estimated from dwell: ~' + r.rome_tscore.toLocaleString() + ' pts, ~' + (r.days_until_red >= 0 ? r.days_until_red.toFixed(1) + 'd to red' : 'N/A') : 'Non-operational trailer (storage/waste)'}</p>
+      <p style="color:#63b3ed;font-size:.82rem">💡 Upload ROME CSV to Tab 1 first for full T-Score, TTS, and unit data</p>`}
+      ${r.notes ? `<h3>Notes</h3><p style="font-size:.85rem;color:#cbd5e0;white-space:pre-wrap;max-height:250px;overflow-y:auto;background:#0f3460;padding:10px;border-radius:6px">${r.notes}</p>` : ''}
+    `;
+    document.getElementById('detail-overlay').classList.remove('hidden');
+  }
+
+  // --- Export ---
+  function exportCSV() {
+    if (!ymsFiltered.length) return;
+    const keys = YMS_COLUMNS.map(c => c.key);
+    const labels = YMS_COLUMNS.map(c => c.label);
+    const lines = [labels.join(',')];
+    ymsFiltered.forEach(r => {
+      lines.push(keys.map(k => { let v = String(r[k]??''); if (/[,"\n]/.test(v)) v = '"'+v.replace(/"/g,'""')+'"'; return v; }).join(','));
+    });
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `yms_yard_PHX6_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  }
+
+  // --- Init ---
+  function handleFile(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const rows = parseCSV(e.target.result);
+        if (!rows.length) { alert('0 rows found.'); return; }
+        const keys = Object.keys(rows[0]);
+        console.log('YMS columns:', keys);
+        if (!('vehicle_id' in rows[0]) && !('location' in rows[0])) {
+          alert('Unrecognized format.\nFound: ' + keys.join(', ')); return;
+        }
+        ymsData = rows.map(processRow).filter(Boolean);
+        enrichFromTab1();
+        ymsSortCol = 'time_in_yard_hours'; ymsSortAsc = false;
+        document.getElementById('yms-upload-section').classList.add('hidden');
+        document.getElementById('yms-dashboard').classList.remove('hidden');
+        populateFilters(); applyFilters();
+      } catch (err) { alert('Error: ' + err.message); console.error(err); }
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  document.getElementById('yms-file-input').addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+  const dz = document.getElementById('yms-drop-zone');
+  dz.addEventListener('click', () => document.getElementById('yms-file-input').click());
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('dragover'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+  document.getElementById('yms-filter-location').addEventListener('change', applyFilters);
+  document.getElementById('yms-filter-category').addEventListener('change', applyFilters);
+  document.getElementById('yms-filter-owner').addEventListener('change', applyFilters);
+  document.getElementById('yms-filter-stale').addEventListener('change', applyFilters);
+  document.getElementById('yms-filter-hide-storage').addEventListener('change', applyFilters);
+  document.getElementById('yms-btn-export').addEventListener('click', exportCSV);
+})();
+
+</script>
 <script>
 // Tab switching
 document.querySelectorAll('#tab-bar .tab').forEach(btn => {
